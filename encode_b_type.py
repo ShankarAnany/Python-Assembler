@@ -21,7 +21,7 @@ insts =[
 labels = {
     "loop": 24
 }
-def encode_b_type(instruction,rs1,rs2,imm):
+def encode_b(instruction,rs1,rs2,imm):
     b_type_funct3 = {
     "beq":  "000", 
     "bne":  "001",   
@@ -50,17 +50,23 @@ def encode_b_type(instruction,rs1,rs2,imm):
 def convert_to_binary():
     for inst in insts:
         if inst['format']== 'b':
-            rs1=reg_set[inst['operands'][0]]
-            rs2=reg_set[inst['operands'][1]]
-            label=inst['operands'][2]
-            imm=labels[label]-inst['pc']
+            if inst['operands'][2] in labels:
+                label=inst['operands'][2]
+                imm=labels[label]-inst['pc']
 
-            rs1=format(rs1,'05b')
-            rs2=format(rs2,'05b')
-            imm=format(imm,'012b')
-            encoded=encode_b_type(inst['operation'],rs1,rs2,imm)
-            print(encoded)
-            
+                if -2048<=imm<=2047:
+                    rs1=reg_set[inst['operands'][0]]
+                    rs2=reg_set[inst['operands'][1]]
+                    rs1=format(rs1,'05b')
+                    rs2=format(rs2,'05b')
+                    imm=format(imm,'013b')
+                    encoded=encode_b(inst['operation'],rs1,rs2,imm)
+                    print(encoded)
+                else:
+                    print("Immediate out of range")
+            else:
+                print("Label not found")
+                
             
 
 convert_to_binary()
