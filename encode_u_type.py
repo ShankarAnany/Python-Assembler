@@ -16,7 +16,11 @@ def encode_u_type(inst):
     if imm > 524287 or imm < -534288:
         return "ERROR: Immediate is incorrect."
 
-    rd_binary = register_mapping[rd]
+    try:
+        rd_binary = register_mapping[rd]
+    
+    except:
+        return "Invalid Operand"
 
     imm_binary = format(imm % (2^20), "020b")
 
