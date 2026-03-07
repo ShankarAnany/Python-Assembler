@@ -18,7 +18,7 @@ def encode_u_type(inst):
 
     rd_binary = register_mapping[rd]
 
-    imm_binary = format(imm , "020b")
+    imm_binary = format(imm % (2^20), "020b")
 
     opcode_binary = u_type_table[opcode]["opcode"]
 
