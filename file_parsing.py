@@ -15,9 +15,16 @@ def parse_file(file_name):
 
     file = open(file_name, "r")
     lines  = file.readlines()
+
+    if "beq zero,zero,0x00000000" not in lines:
+        print("Virtual Halt Does'nt Exist")
+    elif lines[-1] != "beq zero,zero,0x00000000":
+        print("Virtual Halt is not last instruction")
     
     pc = 0
+    line_num = 0
     for line in lines:
+        line_num += 1
         # ignore empty lines
         if line == "\n":
             print("e")
@@ -52,19 +59,20 @@ def parse_file(file_name):
             instr["format"] = "u"
         elif line[0] in j_type:
             instr["format"] = "j"
+        else:
+            instr["format"] = "error"
 
-        instr["operation"] = line[0]
-        instr["operands"] = line[1:]
+        if instr["format"] != "error":
+            instr["operation"] = line[0]
+            instr["operands"] = line[1:]
+
+            for i in range(len(instr["operands"])):
+                if instr["operands"][i] in reg_set.keys():
+                    instr["operands"][i] = "x" + str(reg_set[instr["operands"][i]])
+
         instr["pc"] = pc
-
-        for i in range(len(instr["operands"])):
-            if instr["operands"][i] in reg_set.keys():
-                instr["operands"][i] = "x" + str(reg_set[instr["operands"][i]])
-
+        instr["line_num"] = line_num
         insts.append(instr)
 
     file.close()
     return insts, labels
-
-file_name = "test_case_1_in.txt"
-insts, labels = parse_file(file_name)
