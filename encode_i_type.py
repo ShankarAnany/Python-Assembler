@@ -8,15 +8,25 @@ def encode_i_type(inst):
     "x26":"11010","x27":"11011","x28":"11100","x29":"11101","x30":"11110","x31":"11111"
     }
     rd=inst["operands"][0]
-    rs1=inst["operands"][1]
-    imm=int(inst["operands"][2])
-    rd_b=register_map[rd]
-    rs1_b=register_map[rs1]
+
+    if inst["operation"] == "lw":
+        rs1=inst["operands"][2]
+        imm=int(inst["operands"][1])
+    else:
+        rs1=inst["operands"][1]
+        imm=int(inst["operands"][2])
+    try:
+        rd_b=register_map[rd]
+        rs1_b=register_map[rs1]
+    except:
+        return "Invalid Operand"
     s=inst["operation"]
     func3=i_type_table[s]["func3"]
     opcode=i_type_table[s]["opcode"]
-    assert imm>-2048,"Imm value not valid"
-    assert imm<2047,"Imm value not valid"
+    if imm<-2048:
+        return "Imm value not valid"
+    if imm>2047:
+        return "Imm value not valid"
     if imm>=0:
         imm_b=format(imm,"012b") 
     else:

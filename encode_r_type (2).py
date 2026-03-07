@@ -10,15 +10,18 @@ def encode_r_type(inst):
     "srl":{"funct3": "101", "funct7": "0000000"},"or":{"funct3": "110", "funct7": "0000000"},"and":{"funct3": "111", "funct7": "0000000"}
     }
 
-    opcode=inst["opcode"]
-    func3=r_type_table[opcode]["func3"]
-    func7=r_type_table[opcode]["func7"]
+    opcode=inst["operation"]
+    func3=r_type_table[opcode]["funct3"]
+    func7=r_type_table[opcode]["funct7"]
     rd=inst["operands"][0]
     rs1=inst["operands"][1]
     rs2=inst["operands"][2]
-    rd_b=register_map[rd]
-    rs1_b=register_map[rs1]
-    rs2_b=register_map[rs2]
+    try:
+        rd_b=register_map[rd]
+        rs1_b=register_map[rs1]
+        rs2_b=register_map[rs2]
+    except:
+        return "Invalid Operand"
     opcode_bin = "0110011"
     binary = func7+rs2_b+rs1_b+func3+rd_b+opcode_bin
     return binary
