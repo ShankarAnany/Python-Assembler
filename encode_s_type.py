@@ -20,9 +20,13 @@ def encode_s_type(inst):
     if imm > 2047 or imm < -2048:
         return "ERROR: Immediate is incorrect."
 
-    rs2_binary = register_mapping[rs2]
+    try:
+        rs2_binary = register_mapping[rs2]
 
-    rs1_binary = register_mapping[rs1]
+        rs1_binary = register_mapping[rs1]
+    except:
+
+        return "Invalid Operand"
 
     imm_binary = format(imm % (2^12), "012b")
 
