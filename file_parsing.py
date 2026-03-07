@@ -16,11 +16,6 @@ def parse_file(file_name):
     file = open(file_name, "r")
     lines  = file.readlines()
 
-    if "beq zero,zero,0x00000000" not in lines:
-        print("Virtual Halt Does'nt Exist")
-    elif lines[-1] != "beq zero,zero,0x00000000":
-        print("Virtual Halt is not last instruction")
-    
     pc = 0
     line_num = 0
     for line in lines:
@@ -39,9 +34,18 @@ def parse_file(file_name):
         line = line.replace(")", " ")
         line = line.split()
 
+        for word in line:
+            if word == "":
+                line.remove(word)
+
         # label handling
         if line[0][-1] == ":":
             labels[line[0][:-1]] = pc
+            line.pop(0)
+
+        if ":" in line:
+            labels[line[0]] = pc
+            line.pop(0)
             line.pop(0)
 
         instr = {}
