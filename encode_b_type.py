@@ -5,22 +5,7 @@ reg_set = {
 "x16":16, "x17":17, "x18":18, "x19":19, "x20":20, "x21":21, "x22":22, "x23":23,
 "x24":24, "x25":25, "x26":26, "x27":27, "x28":28, "x29":29, "x30":30, "x31":31
 }
-insts =[
-{'format':'i','operation':'addi','operands':['x1','x0','5'],'pc':4},
 
-{'format':'i','operation':'addi','operands':['x2','x0','10'],'pc':8},
-
-{'format':'b','operation':'beq','operands':['x1','x2','loop'],'pc':12},
-
-{'format':'i','operation':'addi','operands':['x3','x0','1'],'pc':16},
-
-{'format':'i','operation':'addi','operands':['x4','x0','2'],'pc':20},
-
-{'format':'r','operation':'add','operands':['x5','x1','x2'],'pc':24}
-]
-labels = {
-    "loop": 24
-}
 def encode_b(instruction,rs1,rs2,imm):
     b_type_funct3 = {
     "beq":  "000", 
@@ -47,26 +32,25 @@ def encode_b(instruction,rs1,rs2,imm):
     return encoded_inst
 
 
-def convert_to_binary():
-    for inst in insts:
-        if inst['format']== 'b':
-            if inst['operands'][2] in labels:
-                label=inst['operands'][2]
-                imm=labels[label]-inst['pc']
+def encode_b_type(inst, labels):
+    if inst['operands'][2] in labels:
+        label=inst['operands'][2]
+        imm=(labels[label]-inst['pc'])//2
+    elif inst['operands'][2].isdigit():
+        imm=int(inst['operands'][2])
+    else:
+        return "Label Not Found"
 
-                if -2048<=imm<=2047:
-                    rs1=reg_set[inst['operands'][0]]
-                    rs2=reg_set[inst['operands'][1]]
-                    rs1=format(rs1,'05b')
-                    rs2=format(rs2,'05b')
-                    imm=format(imm,'013b')
-                    encoded=encode_b(inst['operation'],rs1,rs2,imm)
-                    print(encoded)
-                else:
-                    print("Immediate out of range")
-            else:
-                print("Label not found")
-                
-            
-
-convert_to_binary()
+    if -2048<=imm<2047:
+        try:
+            rs1=reg_set[inst['operands'][0]]
+            rs2=reg_set[inst['operands'][1]]
+        except:
+            return "Invalid Operand"
+        rs1=format(rs1 % 32,'05b')
+        rs2=format(rs2 % 32,'05b')
+        imm=format(imm % 4096,'012b')
+        encoded=encode_b(inst['operation'],rs1,rs2,imm)
+        return encoded
+    else:
+        return "Immediate out of range"

@@ -4,34 +4,20 @@ reg_set = {
 "x16":16, "x17":17, "x18":18, "x19":19, "x20":20, "x21":21, "x22":22, "x23":23,
 "x24":24, "x25":25, "x26":26, "x27":27, "x28":28, "x29":29, "x30":30, "x31":31
 }
-insts = [
 
-{'format':'i','operation':'addi','operands':['x1','x0','5'],'pc':4},
+def encode_j(inst,labels):
+    if inst['operands'][1] in labels:
+        try:
+            ra=reg_set[inst['operands'][0]]
+        except:
+            return "Invalid Operand"
+        label=inst['operands'][1]
+        imm=(labels[label]-inst['pc'])//2
 
-{'format':'j','operation':'jal','operands':['x5','loop'],'pc':8},
+        ra=format(ra % 32,'05b')
+        imm=format(imm % (2^20),'020b')
+        encoded_inst=imm[0:1]+imm[10:20]+imm[9:10]+imm[1:9]+ra+'1101111'
 
-{'format':'i','operation':'addi','operands':['x2','x0','1'],'pc':12},
-
-{'format':'r','operation':'add','operands':['x3','x1','x2'],'pc':16}
-
-]
-labels = {
-    "loop": 16
-}
-def encode_j():
-    for inst in insts:
-        if inst['format']=='j':
-            if inst['operands'][1] in labels:
-                ra=reg_set[inst['operands'][0]]
-                label=inst['operands'][1]
-                imm=labels[label]-inst['pc']
-
-                ra=format(ra,'05b')
-                imm=format(imm,'021b')
-                encoded_inst=imm[0:1]+imm[10:20]+imm[9:10]+imm[1:9]+ra+'1101111'
-
-                return encoded_inst
-            else:
-                print("Label not found")
-encoded=encode_j()
-print (encoded)
+        return encoded_inst
+    else:
+        return "Label Not Found"
